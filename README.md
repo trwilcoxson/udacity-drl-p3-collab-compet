@@ -1,41 +1,26 @@
-# Collaboration and Competition — Deep Reinforcement Learning
+# Self-Play DDPG Tennis
 
 **Author**: Tim Wilcoxson
 
 A self-play DDPG agent that learns to play Tennis in a Unity ML-Agents environment, where two agents cooperate to rally a ball over a net.
 
-## Environment
+## Project Details
 
-- **State space**: 24 dimensions per agent (3 stacked frames × 8 variables: ball/racket position and velocity)
-- **Action space**: 2 continuous actions per agent (movement toward/away from net, jumping), each in [-1, 1]
-- **Agents**: 2 agents sharing one actor, one critic, and one replay buffer
-- **Reward**: +0.1 for hitting the ball over the net, -0.01 if ball hits ground or goes out of bounds
-- **Solve condition**: Average of max(agent1_score, agent2_score) >= 0.5 over 100 consecutive episodes
+In this environment, two agents control rackets to bounce a ball over a net.
 
-## Project Structure
+- **State space**: The observation space consists of 24 variables per agent, corresponding to the position and velocity of the ball and racket (3 stacked frames × 8 variables each).
+- **Action space**: Each agent has 2 continuous actions available — movement toward or away from the net, and jumping — each clipped to [-1, 1].
+- **Agents**: 2 agents sharing one actor, one critic, and one replay buffer (self-play).
+- **Reward**: An agent receives +0.1 for hitting the ball over the net, and -0.01 if the ball hits the ground or goes out of bounds.
+- **Solving condition**: The environment is considered solved when the average score reaches +0.5 over 100 consecutive episodes, where each episode's score is the maximum over both agents.
 
-| File | Description |
-|---|---|
-| `Tennis.ipynb` | Main training notebook with results |
-| `model.py` | Actor and Critic network architectures (128-unit layers, no BatchNorm) |
-| `maddpg_agent.py` | Self-play DDPG agent with exploration noise decay, OU noise, replay buffer |
-| `train.py` | Standalone training script |
-| `Report.md` | Detailed report: algorithm, architecture, hyperparameters, plot, future work |
-| `checkpoint_actor.pth` | Trained actor weights |
-| `checkpoint_critic.pth` | Trained critic weights |
-| `scores.npy` | Raw per-episode scores |
-| `scores_plot.png` | Training rewards plot |
-| `python/` | Bundled Unity ML-Agents Python package (v0.4) |
-| `Tennis.app/` | macOS Unity environment (gitignored) |
-
-## Setup
+## Getting Started
 
 ### Prerequisites
 
 - [Anaconda](https://www.anaconda.com/download) or [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
-- macOS (this project uses the macOS Tennis.app environment)
 
-### Installation
+### Dependencies
 
 1. Clone this repository:
    ```bash
@@ -49,7 +34,7 @@ A self-play DDPG agent that learns to play Tennis in a Unity ML-Agents environme
    conda activate drlnd-nav
    ```
 
-3. Install dependencies (includes PyTorch, NumPy, Jupyter, and all other required packages):
+3. Install dependencies (includes PyTorch, NumPy, Jupyter, protobuf, and all other required packages):
    ```bash
    cd python
    pip install .
@@ -61,27 +46,60 @@ A self-play DDPG agent that learns to play Tennis in a Unity ML-Agents environme
    python -m ipykernel install --user --name drlnd-nav --display-name "Python (drlnd-nav)"
    ```
 
-5. Download the Tennis environment for your OS, unzip it, and place it in the project root:
-   - [macOS](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Tennis/Tennis.app.zip)
-   - [Linux](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Tennis/Tennis_Linux.zip)
-   - [Windows 64-bit](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Tennis/Tennis_Windows_x86_64.zip)
-   - [Windows 32-bit](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Tennis/Tennis_Windows_x86.zip)
+### Download the Unity Environment
 
-   **macOS users**: After unzipping, remove the quarantine attribute so the app can launch:
-   ```bash
-   xattr -cr Tennis.app
-   ```
+Download the Tennis environment for your OS, unzip it, and place it in the project root:
 
-   **Linux/Windows users**: After unzipping, update the `file_name` path in the notebook's environment initialization cell to match your extracted binary (e.g., `Tennis_Linux/Tennis.x86_64` or `Tennis_Windows_x86_64/Tennis.exe`).
+- [macOS](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Tennis/Tennis.app.zip)
+- [Linux](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Tennis/Tennis_Linux.zip)
+- [Windows 64-bit](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Tennis/Tennis_Windows_x86_64.zip)
+- [Windows 32-bit](https://s3-us-west-1.amazonaws.com/udacity-drlnd/P3/Tennis/Tennis_Windows_x86.zip)
 
-## Training
+**macOS users**: After unzipping, remove the quarantine attribute so the app can launch:
+```bash
+xattr -cr Tennis.app
+```
+
+**Linux/Windows users**: After unzipping, update the `file_name` path in the notebook's environment initialization cell to match your extracted binary (e.g., `Tennis_Linux/Tennis.x86_64` or `Tennis_Windows_x86_64/Tennis.exe`).
+
+## Instructions
+
+To train the agent from scratch:
 
 ```bash
 conda activate drlnd-nav
 jupyter notebook Tennis.ipynb
 ```
 
-Select the **"Python (drlnd-nav)"** kernel and run all cells. The agent typically solves the environment in 1000–2000 episodes.
+Select the **"Python (drlnd-nav)"** kernel and run all cells. The notebook will:
+1. Initialize the Tennis environment
+2. Train a self-play DDPG agent (typically solves in 1000–2000 episodes)
+3. Save model weights to `checkpoint_actor.pth` and `checkpoint_critic.pth`
+4. Plot the training scores
+5. Run a 100-episode greedy evaluation with the trained weights
+
+To watch the trained agent play without retraining, skip the training cell and load the pre-trained `.pth` weights directly.
+
+Alternatively, run the standalone training script:
+```bash
+conda activate drlnd-nav
+python -u train.py
+```
+
+## Project Structure
+
+| File | Description |
+|---|---|
+| `Tennis.ipynb` | Main training notebook with results and report |
+| `model.py` | Actor and Critic network architectures (128-unit layers, no BatchNorm) |
+| `maddpg_agent.py` | Self-play DDPG agent with exploration noise decay, OU noise, replay buffer |
+| `train.py` | Standalone training script |
+| `Report.md` | Detailed report: algorithm, architecture, hyperparameters, plot, future work |
+| `checkpoint_actor.pth` | Trained actor weights (saved at solve point) |
+| `checkpoint_critic.pth` | Trained critic weights (saved at solve point) |
+| `scores.npy` | Raw per-episode scores |
+| `scores_plot.png` | Training rewards plot |
+| `python/` | Bundled Unity ML-Agents Python package (v0.4) |
 
 ## Results
 
