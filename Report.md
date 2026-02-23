@@ -126,7 +126,7 @@ Actions are injected after the first hidden layer (as recommended in the DDPG pa
 
 ![Training Scores](scores_plot.png)
 
-The plot shows the max score across both agents per episode (light) and the 100-episode rolling average (dark). The environment was **solved at episode 1336**, when the 100-episode rolling average first exceeded 0.5. Training continued for 200 additional episodes, during which the rolling average peaked at approximately 1.2.
+The plot shows the max score across both agents per episode (light) and the 100-episode rolling average (dark). The environment was **solved at episode 1336**, when the 100-episode rolling average first exceeded 0.5. The standalone training script (`train.py`) continues training past the solve point; the rolling average peaked at approximately 1.2 before the run ended.
 
 **Training dynamics**: Scores remain near zero for the first ~1200 episodes as the agents explore randomly — this extended "desert" is characteristic of sparse-reward environments where the agent must discover the rewarding behavior (hitting the ball over the net) through random exploration before it can begin learning. Around episode 1200, individual scores begin spiking (0.1–0.6), and the rolling average rises rapidly from 0.01 to 0.5 over ~130 episodes. This sudden onset reflects the cooperative nature of Tennis: once one agent learns to return the ball, the other agent starts receiving positive experiences too, creating a positive feedback loop.
 
